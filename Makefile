@@ -99,7 +99,7 @@ $(BUILD_DIR):
 $(BUILD_DIR)/%.o: %.c $(HEADERS) | $(BUILD_DIR)
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/$(PRODUCT_NAME).axf: $(OBJS) driverlib
+$(BUILD_DIR)/$(PRODUCT_NAME).axf: $(OBJS) $(LIB_MSP_PATH)
 	$(LD) $(LFLAGS) -o $@ $(OBJS) $(LIB_PATHS)
 
 $(BUILD_DIR)/$(PRODUCT_NAME): $(BUILD_DIR)/$(PRODUCT_NAME).axf
