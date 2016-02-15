@@ -34,38 +34,50 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * --/COPYRIGHT--*/
-/******************************************************************************
- * MSP432 Empty Project
+/*******************************************************************************
+ * MSP432 GPIO - Toggle Output High/Low
  *
- * Description: An empty project that uses DriverLib. In this project, DriverLib
- * is built from source instead of the usual library.
+ * Description: In this very simple example, the LED on P1.0 is configured as
+ * an output using DriverLib's GPIO APIs. An infinite loop is then started
+ * which will continuously toggle the GPIO and effectively blink the LED.
  *
  *                MSP432P401
  *             ------------------
  *         /|\|                  |
  *          | |                  |
- *          --|RST               |
+ *          --|RST         P1.0  |---> P1.0 LED
  *            |                  |
  *            |                  |
  *            |                  |
  *            |                  |
- *            |                  |
- * Author: 
-*******************************************************************************/
+ *
+ * Author: Timothy Logan
+ ******************************************************************************/
 /* DriverLib Includes */
 #include "driverlib.h"
 
 /* Standard Includes */
 #include <stdint.h>
+
 #include <stdbool.h>
 
 int main(void)
 {
-    /* Stop Watchdog */
+    volatile uint32_t i;
+
+    /* Halting the Watchdog */
     MAP_WDT_A_holdTimer();
 
-    while(1)
+    /* Configuring P1.0 as output */
+    MAP_GPIO_setAsOutputPin(GPIO_PORT_P1, GPIO_PIN0);
+
+    while (1)
     {
-        
+        /* Delay Loop */
+        for(i = 0; i < 10000; i++)
+        {
+        }
+
+        MAP_GPIO_toggleOutputOnPin(GPIO_PORT_P1, GPIO_PIN0);
     }
 }
