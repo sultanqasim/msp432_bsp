@@ -108,6 +108,11 @@ $(BUILD_DIR)/$(PRODUCT_NAME): $(BUILD_DIR)/$(PRODUCT_NAME).axf
 
 $(PRODUCT_NAME): build/$(PRODUCT_NAME)
 
+# Flashing
+.PHONY: load
+load: $(BUILD_DIR)/$(PRODUCT_NAME).axf
+	DSLite load -f $< -c MSP432P401R.ccxml
+
 # Cleaning
 .PHONY: clean clean_driverlib cleanall
 clean:
