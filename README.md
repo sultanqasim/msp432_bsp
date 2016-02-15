@@ -10,7 +10,9 @@ Use the (proprietary and hard to find) DSLite utility to flash your code onto
 the LaunchPad using the integrated XDS110 emulator. The utility is bundled
 inside the CCS web support package, and is also bundled with Energia.
 For convenience, I have uploaded the Linux version of the standalone utility
-to [Mediafire](https://www.mediafire.com/?5f58fbthmnz1gbr).
+to [Mediafire](https://www.mediafire.com/?5f58fbthmnz1gbr). You can also
+find DSLite with the TI packages available
+[here](http://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSP-EXP432P401R/latest/index_FDS.html).
 
 Your udev rules will need to be configured to allow you to access the
 LaunchPad. The rule you need is:
