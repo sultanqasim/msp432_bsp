@@ -30,8 +30,8 @@
 typedef char * caddr_t;
 
 static caddr_t heap_end = NULL;
-extern unsigned long _heap_bottom;
-extern unsigned long _heap_top;
+extern unsigned long __heap_bottom;
+extern unsigned long __heap_top;
 
 // sbrk is used to set aside space for use by malloc
 caddr_t _sbrk(int incr)
@@ -41,14 +41,14 @@ caddr_t _sbrk(int incr)
     // If this is the first run, initialize the heap_end pointer to the
     // bottom of the heap
     if (heap_end == NULL)
-        heap_end = (caddr_t)&_heap_bottom;
+        heap_end = (caddr_t)&__heap_bottom;
 
     // The current heap end is what we'll return
     // It is the start of the region allocated for the caller
     prev_heap_end = heap_end;
 
     // Don't allow allocating more memory than we have room for in our heap
-    if (heap_end + incr > (caddr_t)&_heap_top)
+    if (heap_end + incr > (caddr_t)&__heap_top)
     {
         errno = ENOMEM;
         return (void *)-1;

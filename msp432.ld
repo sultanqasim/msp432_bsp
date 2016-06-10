@@ -25,7 +25,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-_stack_size = 2K;
+_STACK_SIZE = 2K;
+_INTVECS_BASE = 0x00000000;
 
 MEMORY
 {
@@ -36,34 +37,81 @@ MEMORY
 
 SECTIONS
 {
-    .text :
-    {
-        _text = .;
-        KEEP(*(.isr_vector))
-        *(.text*)
-        *(.rodata*)
-        _etext = .;
+    .intvecs (_INTVECS_BASE) : AT (_INTVECS_BASE) {
+        KEEP (*(.intvecs))
     } > FLASH
 
-    .data : AT(ADDR(.text) + SIZEOF(.text))
-    {
-        _data = .;
-        *(vtable)
-        *(.data*)
-        _edata = .;
+    .text : {
+        CREATE_OBJECT_SYMBOLS
+        KEEP (*(.text))
+        *(.text.*)
+        . = ALIGN(4);
+        KEEP (*(.ctors))
+        . = ALIGN(4);
+        KEEP (*(.dtors))
+        . = ALIGN(4);
+        __init_array_start = .;
+        KEEP (*(.init_array*))
+        __init_array_end = .;
+        . = ALIGN(4);
+        *(.init)
+        *(.fini*)
+        . = ALIGN(4);
+    } > FLASH AT> FLASH
+
+    .rodata : {
+        *(.rodata)
+        *(.rodata.*)
+        . = ALIGN(4);
+    } > FLASH AT> FLASH
+
+    .ARM.exidx : {
+        __exidx_start = .;
+        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+        __exidx_end = .;
+    } > FLASH AT> FLASH
+
+    .ARM.extab : {
+        *(.ARM.extab* .gnu.linkonce.armextab.*)
+    } > FLASH AT> FLASH
+
+    __etext = .;
+
+    .vtable : {
+        KEEP (*(.vtable))
+        . = ALIGN(4);
     } > SRAM
 
-    .bss :
-    {
-        _bss = .;
-        *(.bss*)
+    .data : {
+        __data_load__ = LOADADDR (.data);
+        __data_start__ = .;
+        KEEP (*(.data))
+        KEEP (*(.data*))
+        . = ALIGN(4);
+        __data_end__ = .;
+    } > SRAM AT> FLASH
+
+    .bss : {
+        __bss_start__ = .;
+        *(.shbss)
+        KEEP (*(.bss))
+        *(.bss.*)
         *(COMMON)
-        _ebss = .;
-    } > SRAM
+        . = ALIGN(4);
+        __bss_end__ = .;
+    } > SRAM AT> SRAM
 
-    _heap_bottom = .;
-    _heap_top = ORIGIN(SRAM) + LENGTH(SRAM) - _stack_size;
+    .heap : {
+        __heap_bottom = .;
+        . += ORIGIN(SRAM) + LENGTH(SRAM) - __heap_bottom - _STACK_SIZE;
+        . = ALIGN(8);
+        __heap_top = .;
+    } > SRAM AT> SRAM
 
-    _stack_bottom = _heap_top;
-    _stack_top = ORIGIN(SRAM) + LENGTH(SRAM);
+    .stack (NOLOAD) : {
+        __stack_bottom = .;
+        . += _STACK_SIZE;
+        . = ALIGN(8);
+        __stack_top = .;
+    } > SRAM AT> SRAM
 }
