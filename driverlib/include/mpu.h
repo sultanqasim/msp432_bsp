@@ -1,6 +1,6 @@
 /*
  * -------------------------------------------
- *    MSP432 DriverLib - v2_20_00_08 
+ *    MSP432 DriverLib - v3_10_00_09 
  * -------------------------------------------
  *
  * --COPYRIGHT--,BSD,BSD
@@ -64,8 +64,8 @@ extern "C"
 // Flags that can be passed to MPU_enableModule.
 //
 //*****************************************************************************
-#define MPU_CONFIG_PRIV_DEFAULT     MPU_CTRL_PRIVDEFENA
-#define MPU_CONFIG_HARDFLT_NMI      MPU_CTRL_HFNMIENA
+#define MPU_CONFIG_PRIV_DEFAULT     MPU_CTRL_PRIVDEFENA_Msk
+#define MPU_CONFIG_HARDFLT_NMI      MPU_CTRL_HFNMIENA_Msk
 #define MPU_CONFIG_NONE             0
 
 //*****************************************************************************

@@ -53,7 +53,7 @@ HEADERS := \
 LANG_FLAGS      := -std=c11 -Wall -Wextra -pedantic
 ARM_FLAGS       := -mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp
 SECTION_FLAGS   := -ffunction-sections -fdata-sections
-DEFINE_FLAGS    := -D__MSP432P401R__ -DUSE_CMSIS_REGISTER_FORMAT
+DEFINE_FLAGS    := -D__MSP432P401R__ -DTARGET_IS_MSP432P4XX -DUSE_CMSIS_REGISTER_FORMAT
 INCLUDE_FLAGS   := $(patsubst %, -I %, $(INCLUDE_DIRS))
 
 CFLAGS = $(LANG_FLAGS) $(ARM_FLAGS) $(SECTION_FLAGS) $(DEFINE_FLAGS) $(INCLUDE_FLAGS)
