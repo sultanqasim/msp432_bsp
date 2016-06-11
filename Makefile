@@ -41,12 +41,16 @@ DLIB_INCLUDE_DIRS := \
     driverlib/include \
     driverlib/board_include \
     driverlib/board_include/CMSIS
-INCLUDE_DIRS := $(DLIB_INCLUDE_DIRS) include
+BSP_INCLUDE_DIRS := bsp/include
+INCLUDE_DIRS := $(DLIB_INCLUDE_DIRS) $(BSP_INCLUDE_DIRS) include
 DLIB_HEADERS := \
     $(shell find driverlib/include -type f) \
     $(shell find driverlib/board_include -type f)
+BSP_HEADERS := \
+    $(shell find bsp/include -type f)
 HEADERS := \
     $(DLIB_HEADERS) \
+    $(BSP_HEADERS) \
     $(shell find include -type f)
 
 # Build flags
@@ -67,8 +71,9 @@ LIB_GCC_PATH    := $(shell ${CC} ${CFLAGS} -print-libgcc-file-name)
 LIBC_PATH       := $(shell ${CC} ${CFLAGS} -print-file-name=libc.a)
 LIBM_PATH       := $(shell ${CC} ${CFLAGS} -print-file-name=libm.a)
 LIB_MSP_PATH    := driverlib/build/libmsp432.a
+LIB_BSP_PATH    := bsp/build/libbsp432.a
 
-LIB_PATHS = $(LIB_GCC_PATH) $(LIBC_PATH) $(LIBM_PATH) $(LIB_MSP_PATH)
+LIB_PATHS = $(LIB_GCC_PATH) $(LIBC_PATH) $(LIBM_PATH) $(LIB_MSP_PATH) $(LIB_BSP_PATH)
 
 # Building the driverlib
 .PHONY: driverlib
@@ -86,6 +91,22 @@ $(DLIB_BUILD_DIR)/%.o: driverlib/%.c $(DLIB_HEADERS) | $(DLIB_BUILD_DIR)
 $(LIB_MSP_PATH): $(DRIVERLIB_OBJS) | $(DLIB_BUILD_DIR)
 	$(AR) rcs $@ $^
 
+# Building the BSP
+.PHONY: bsp
+bsp: $(LIB_BSP_PATH)
+BSP_BUILD_DIR := bsp/build
+BSP_SRCS      := $(wildcard bsp/*.c)
+BSP_OBJS      := $(patsubst bsp/%.c, $(BSP_BUILD_DIR)/%.o, $(BSP_SRCS))
+
+$(BSP_BUILD_DIR):
+	mkdir -p $@
+
+$(BSP_BUILD_DIR)/%.o: bsp/%.c $(BSP_HEADERS) | $(BSP_BUILD_DIR)
+	$(CC) -c $(CFLAGS) $< -o $@
+
+$(LIB_BSP_PATH): $(BSP_OBJS) | $(BSP_BUILD_DIR)
+	$(AR) rcs $@ $^
+
 # Building the project
 BUILD_DIR := build
 SRCS := $(wildcard *.c)
@@ -99,7 +120,7 @@ $(BUILD_DIR):
 $(BUILD_DIR)/%.o: %.c $(HEADERS) | $(BUILD_DIR)
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(BUILD_DIR)/$(PRODUCT_NAME).axf: $(OBJS) $(LIB_MSP_PATH)
+$(BUILD_DIR)/$(PRODUCT_NAME).axf: $(OBJS) $(LIB_MSP_PATH) $(LIB_BSP_PATH)
 	$(LD) $(LFLAGS) -o $@ $(OBJS) $(LIB_PATHS)
 
 $(BUILD_DIR)/$(PRODUCT_NAME): $(BUILD_DIR)/$(PRODUCT_NAME).axf
@@ -116,7 +137,7 @@ load: $(BUILD_DIR)/$(PRODUCT_NAME).axf
 # Cleaning
 .PHONY: clean clean_driverlib cleanall
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_DIR) $(BSP_BUILD_DIR)
 
 clean_driverlib:
 	rm -rf $(DLIB_BUILD_DIR)
